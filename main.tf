@@ -148,8 +148,7 @@ resource "google_compute_instance" "vm_instance" {
 }
 
 resource "google_compute_instance" "worker" {
-  # TODO: Figure out how many requests a single instance can send.
-  count        = max(ceil(var.requests-per-second / 100), 1)
+  count        = max(ceil(var.requests-per-second / local.rps-per-worker), 1)
   name         = "${var.instance-name}-worker-${count.index}"
   machine_type = var.instance-type
 
@@ -178,4 +177,5 @@ resource "google_compute_instance" "worker" {
 locals {
   public-ip  = google_compute_instance.vm_instance.network_interface[0].access_config[0].nat_ip
   private-ip = google_compute_instance.vm_instance.network_interface[0].network_ip
+  rps-per-worker = 80
 }
